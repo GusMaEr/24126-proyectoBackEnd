@@ -98,7 +98,7 @@ app.get('/dashboard', verifyToken, (req, res) => {
   res.status(200).send('Bienvenido al dashboard!');
 });
 
-// Start the server
+// Iniciar Servidor
 app.listen(3000, () => {
   console.log('Server iniciado en el puerto 3000');
 });
