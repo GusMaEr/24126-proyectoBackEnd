@@ -1,16 +1,15 @@
 // server.js
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const Sequelize = require('sequelize');
 const app = express();
-const cors = require('cors');
-
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public')); // to serve your static files
+app.use(express.static('public')); // para servir sus archivos estáticos
 
 // Database configuration
 const sequelize = new Sequelize("proyecto1_backend", "proyecto1", "Rec3178chI", {
@@ -22,41 +21,35 @@ const sequelize = new Sequelize("proyecto1_backend", "proyecto1", "Rec3178chI", 
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connected to the database successfully');
+    console.log('Conectado a la base de datos');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('No se puede conectar a la base de datos:', error);
   }
 };
-
 connectDB();
 
-// Define the User model
+// Definir el modelo de la tabla user
 const User = sequelize.define('user', {
-  username: {
-    type: Sequelize.STRING,
-    unique: true,
-    allowNull: false,
-  },
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
+  username: {type: Sequelize.STRING, unique: true, allowNull: false},
+  password: {type: Sequelize.STRING, allowNull: false},
+  createdAt: {type: Sequelize.STRING, allowNull: false},
+  updatedAt: {type: Sequelize.STRING, allowNull: false},
 });
 
-// Middleware to verify JWT token
+// Middleware para verificar el token JWT
 function verifyToken(req, res, next) {
   const token = req.headers['x-access-token'];
-  if (!token) return res.status(403).send({ auth: false, message: 'No token provided.' });
+  if (!token) return res.status(403).send({ auth: false, message: 'No se proporciona ningun token.' });
 
   jwt.verify(token, 'your-secret-key', (err, decoded) => {
-    if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    if (err) return res.status(500).send({ auth: false, message: 'No se pudo autenticar el token.' });
 
     req.userId = decoded.id;
     next();
   });
 }
 
-// Registration route
+// Rutas para alta de usuario
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 8);
@@ -77,14 +70,14 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login route
+// Ruta para login 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const user = await User.findOne({ where: { username } });
 
-    if (!user) return res.status(404).send('User not found.');
+    if (!user) return res.status(404).send('Usuario no encontrado.');
 
     const passwordIsValid = bcrypt.compareSync(password, user.password);
 
@@ -100,12 +93,12 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Protected route
+// Ruta protegida
 app.get('/dashboard', verifyToken, (req, res) => {
-  res.status(200).send('Welcome to the dashboard!');
+  res.status(200).send('Bienvenido al dashboard!');
 });
 
 // Start the server
 app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+  console.log('Server iniciado en el puerto 3000');
 });
