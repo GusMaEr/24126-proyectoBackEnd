@@ -66,7 +66,7 @@ app.post('/register', async (req, res) => {
 
     res.status(200).send({ auth: true, token });
   } catch (error) {
-    res.status(500).send('There was a problem registering the user.');
+    res.status(500).send('Hubo un problema al registrar al usuario.');
   }
 });
 
