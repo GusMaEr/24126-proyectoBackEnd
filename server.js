@@ -1,19 +1,27 @@
 // server.js
+require('dotenv').config(); // Para manejar variables de entorno
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const Sequelize = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
+
 const app = express();
 
+// Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public')); // para servir sus archivos estáticos
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Ruta para la página principal
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Database configuration
-const sequelize = new Sequelize("proyecto1_backend", "proyecto1", "Rec3178chI", {
-  host: 'mysql-proyecto1.alwaysdata.net',
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
+  host: process.env.DB_HOST,
   dialect: 'mysql',
 });
 
@@ -30,20 +38,34 @@ connectDB();
 
 // Definir el modelo de la tabla user
 const User = sequelize.define('user', {
-  username: {type: Sequelize.STRING, unique: true, allowNull: false},
-  password: {type: Sequelize.STRING, allowNull: false},
-  createdAt: {type: Sequelize.STRING, allowNull: false},
-  updatedAt: {type: Sequelize.STRING, allowNull: false},
+  username: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+      len: [3, 50]
+    }
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+}, {
+  timestamps: true // Esto manejará automáticamente createdAt y updatedAt
 });
+
+sequelize.sync()
+  .then(() => console.log('Database & tables created!'))
+  .catch(err => console.log('Error syncing database:', err));
 
 // Middleware para verificar el token JWT
 function verifyToken(req, res, next) {
   const token = req.headers['x-access-token'];
-  if (!token) return res.status(403).send({ auth: false, message: 'No se proporciona ningun token.' });
+  if (!token) return res.status(403).json({ auth: false, message: 'No se proporciona ningún token.' });
 
-  jwt.verify(token, 'your-secret-key', (err, decoded) => {
-    if (err) return res.status(500).send({ auth: false, message: 'No se pudo autenticar el token.' });
-
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ auth: false, message: 'No se pudo autenticar el token.' });
     req.userId = decoded.id;
     next();
   });
@@ -52,21 +74,25 @@ function verifyToken(req, res, next) {
 // Rutas para alta de usuario
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 8);
+  
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username y password son requeridos.' });
+  }
 
   try {
-    const user = await User.create({
-      username,
-      password: hashedPassword,
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ username, password: hashedPassword });
 
-    const token = jwt.sign({ id: user.id }, 'your-secret-key', {
-      expiresIn: 86400, // expires in 24 hours
-    });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
-    res.status(200).send({ auth: true, token });
+    res.status(201).json({ auth: true, token });
   } catch (error) {
+<<<<<<< HEAD
     res.status(500).send('Hubo un problema al registrar al usuario.');
+=======
+    console.error('Error al registrar usuario:', error);
+    res.status(500).json({ message: 'Error al registrar el usuario.', error: error.message });
+>>>>>>> fe05e30 (fixing some errors)
   }
 });
 
@@ -76,29 +102,27 @@ app.post('/login', async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { username } });
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
-    if (!user) return res.status(404).send('Usuario no encontrado.');
+    const passwordIsValid = await bcrypt.compare(password, user.password);
+    if (!passwordIsValid) return res.status(401).json({ auth: false, token: null });
 
-    const passwordIsValid = bcrypt.compareSync(password, user.password);
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
-    if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
-
-    const token = jwt.sign({ id: user.id }, 'your-secret-key', {
-      expiresIn: 86400, // expires in 24 hours
-    });
-
-    res.status(200).send({ auth: true, token });
+    res.status(200).json({ auth: true, token });
   } catch (error) {
-    res.status(500).send('Server error.');
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error del servidor.', error: error.message });
   }
 });
 
-// Ruta protegida
+// Ruta protegida de ejemplo
 app.get('/dashboard', verifyToken, (req, res) => {
-  res.status(200).send('Bienvenido al dashboard!');
+  res.json({ message: 'Bienvenido al dashboard!' });
 });
 
 // Iniciar Servidor
-app.listen(3000, () => {
-  console.log('Server iniciado en el puerto 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server iniciado en el puerto ${PORT}`);
 });
