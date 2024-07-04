@@ -1,0 +1,52 @@
+
+main {
+  max-width: 1280px;
+  text-align: center;
+ }
+
+ h1 {
+  background-color: #4c8bd3;
+  width: 1280px;
+  padding-left: auto;
+  padding-right: auto;
+  margin-left: auto;
+  margin-right: auto;
+
+ }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  text-transform: uppercase;
+  align-items: stretch;
+  background-image: url(./img/fondo.jpg) 
+ 
+} 
+
+.container {
+  font-size: 1.7rem;
+  color: #ffe600;
+}
+
+.form-container {
+  width: 300px;
+  height: 500px;
+  margin-left: 22%;
+  background-color: #4c8bd3;
+  border: none;
+  border-bottom: white thin solid;
+  text-align: center;
+  outline: none;
+  padding: 0;
+  font-size: 1.4rem;
+  color: #ffe600;
+  float: left;
+}
+
+h2 {
+  height: 60px;
+}
+
+.input-group{
+  height: 100px;
+}
