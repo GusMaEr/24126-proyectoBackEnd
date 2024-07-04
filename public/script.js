@@ -1,3 +1,4 @@
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
@@ -28,9 +29,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(data)
             });
 
-            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            if (response.ok && result.auth) {
+            const contentType = response.headers.get('Content-Type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('La respuesta no es de tipo JSON');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error('La respuesta del servidor está vacía');
+            }
+
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (e) {
+                console.error('Error al parsear JSON:', e);
+                throw new Error('La respuesta del servidor no es JSON válido');
+            }
+
+            if (result.auth) {
                 localStorage.setItem('token', result.token);
                 showMessage(`${url === '/register' ? 'Registro' : 'Inicio de sesión'} exitoso!`);
                 form.reset();
