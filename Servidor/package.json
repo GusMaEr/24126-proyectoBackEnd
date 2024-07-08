@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon node server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "mysql2": "^3.10.2",
+    "nodemon": "^3.1.4",
     "sequelize": "^6.37.3"
   },
-  "description": "",
-  "devDependencies": {}
+  "description": ""
 }
