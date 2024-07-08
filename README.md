@@ -1,27 +1,41 @@
-# 24126-proyectoBackEnd
+# Grupo 24
+# Proyecto = 24126-proyectoBackEnd
+# Github = https://github.com/GusMaEr/24126-proyectoBackEnd.git
+
+===========================
 === Tecnologias usadas ====
+===========================
+
 - Express
 - Cors
 - JsonWebToken o JWT
-    Se utiliza para generar un tocken de seguridad en el front contra el servidor
+    Se utiliza para generar un tocken de seguridad entre el front y el servidor.
+
 - bcryptjs
     Se utiliza para encriptar el password del usuario creado
+    
 - sequelize 
     ORM para consultas sobre mySql
 
+===================
 ==== EndPoint =====
-= Pagina principal de proyecto =
+===================
 
-    http:/localhost:3000
+== Pagina principal de proyecto =
 
-= Test meidiante Postman o Thunder Client
+    http://127.0.0.1:3000
 
-= Creacion de usuario =
+== Test meidiante Postman o Thunder Client
 
-    http://localhost:3000/register
+    = Creacion de usuario =
 
-= Login de usuario =
+        http://127.0.0.1:3000/register
 
-    http://localhost:3000/login
+    = Login de usuario =
 
+        http://127.0.0.1:3000/login
+
+    = Dashboard??????
+
+        http://127.0.0.1:3000/dashboard
 
