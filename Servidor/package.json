@@ -1,7 +1,7 @@
 {
   "name": "proyecto_backend",
   "version": "1.0.0",
-  "main": "script.js",
+  "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,5 +23,5 @@
     "sequelize": "^6.37.3"
   },
   "devDependencies": {},
-  "description": ""
+  "description": "===========================\r === Tecnologias usadas ====\r ==========================="
 }
