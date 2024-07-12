@@ -30,31 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(` HTTP error! status: ${response.status}`);
             }
 
-            const contentType = response.headers.get('Content-Type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error('La respuesta no es de tipo JSON');
-            }
-
-            const text = await response.text();
-            if (!text) {
-                throw new Error('La respuesta del servidor está vacía');
-            }
-
-            let result;
-            try {
-                result = JSON.parse(text);
-            } catch (e) {
-                console.error('Error al parsear JSON:', e);
-                throw new Error('La respuesta del servidor no es JSON válido');
-            }
+            const result = await response.json();
 
             if (result.auth) {
                 localStorage.setItem('token', result.token);
-                showMessage(`${url === '/register' ? 'Registro' : 'Inicio de sesión'} exitoso!`);
+                showMessage(` ${url === '/register' ? 'Registro' : 'Inicio de sesión'} exitoso!`);
                 form.reset();
+               
+                if (url === '/login') {
+                    if (result.userId) {
+                        window.location.href = ` edit.html?id=${result.userId}`;
+                    } else {
+                        console.error('ID de usuario no proporcionado en la respuesta');
+                    }
+                }
             } else {
                 throw new Error(result.message || 'Error en la operación.');
             }
@@ -74,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     togglePasswordButtons.forEach(button => {
         button.addEventListener('click', () => {
-            window.location.href = `edit.html?id=${users.id}`
             const targetId = button.getAttribute('data-target');
             const passwordInput = document.getElementById(targetId);
             if (passwordInput) {
@@ -83,6 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.classList.toggle('fa-eye');
                 button.classList.toggle('fa-eye-slash');
             }
-        });
-    });
+        });
+    });
 });
