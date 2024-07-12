@@ -55,6 +55,8 @@ const User = sequelize.define('user', {
   timestamps: true // Esto manejará automáticamente createdAt y updatedAt
 });
 
+
+
 sequelize.sync()
   .then(() => console.log('Database & tables created!'))
   .catch(err => console.log('Error syncing database:', err));
