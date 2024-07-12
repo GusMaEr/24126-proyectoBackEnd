@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     togglePasswordButtons.forEach(button => {
         button.addEventListener('click', () => {
+            window.location.href = `edit.html?id=${users.id}`
             const targetId = button.getAttribute('data-target');
             const passwordInput = document.getElementById(targetId);
             if (passwordInput) {
